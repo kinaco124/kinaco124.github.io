@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>外食PFCカロリーナビ</title>
+    <title>外食PFC・カロリーナビ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +20,14 @@
         .nav-button { transition: all 0.3s ease; }
         .nav-button.active { background-color: #8D7B68; color: white; }
         .nav-button:hover:not(.active) { background-color: #EFEBE4; }
-        .sort-button.active { background-color: #A4907C; color: white; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+        .sort-button { transition: all 0.2s ease-in-out; }
+        .sort-button.active { 
+            background-color: #A4907C; 
+            color: white; 
+            transform: translateY(-1px); 
+            box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+        }
+        .sort-button:hover:not(.active) { background-color: #f3f0ec; }
     </style>
 </head>
 <body class="text-gray-800">
@@ -55,7 +62,7 @@
                     </div>
                 </div>
                 <div class="mt-6">
-                    <label class="font-semibold text-gray-700 block mb-2">並べ替え:</label>
+                    <label class="font-semibold text-gray-700 block mb-2">並べ替え (最大2項目まで指定可能):</label>
                     <div id="sort-controls" class="flex flex-wrap gap-2"></div>
                 </div>
                  <div id="ohsho-warning" class="mt-4 p-3 bg-amber-100 border-l-4 border-amber-500 text-amber-700 rounded-r-lg hidden">
@@ -104,7 +111,7 @@
             
             <section id="disclaimer" class="mt-12 text-center text-sm text-gray-500 bg-gray-50 p-6 rounded-2xl border">
                  <h3 class="font-bold text-lg text-gray-700 mb-2">データの取り扱いに関するご注意</h3>
-                 <p>本アプリケーションに表示される栄養成分データは、各飲食チェーンの公式サイト（2025年6月時点）から取得したものです。メニューの改訂や情報の更新により、実際の数値と異なる場合があります。正確な情報が必要な場合や、アレルギー情報については、必ず各チェーンの公式サイトをご確認ください。</p>
+                 <p>本アプリケーションに表示される栄養成分データは、各飲食チェーンの公式サイトから取得したものです。メニューの改訂や情報の更新により、実際の数値と異なる場合があります。正確な情報が必要な場合や、アレルギー情報については、必ず各チェーンの公式サイトをご確認ください。データ取得日については各社PDFファイル名等をご参照ください。</p>
             </section>
 
         </main>
@@ -144,7 +151,7 @@
             { chain: '吉野家', name: 'ねぎ塩豚丼並盛', protein: 14.2, fat: 20.6, carbs: 90.0, calories: 599 },
             { chain: '吉野家', name: '牛カルビ丼(成型肉)並盛', protein: 24.0, fat: 30.3, carbs: 94.7, calories: 743 },
             { chain: '吉野家', name: '親子丼並盛', protein: 29.5, fat: 19.3, carbs: 101.7, calories: 695 },
-            { chain: '吉野家', name: 'から揚げ丼並盛(から揚げ3個)', protein: 31.9, fat: 44.0, carbs: 104.5, calories: 943 }, // PDFには個数明記ないが一般的な個数で解釈
+            { chain: '吉野家', name: 'から揚げ丼並盛(から揚げ3個)', protein: 31.9, fat: 44.0, carbs: 104.5, calories: 943 }, 
             { chain: '吉野家', name: '黒カレー並盛', protein: 8.2, fat: 6.4, carbs: 100.5, calories: 480 },
             { chain: '吉野家', name: '牛黒カレー並盛', protein: 15.0, fat: 17.9, carbs: 103.3, calories: 622 },
 
@@ -161,11 +168,11 @@
             { chain: '松屋', name: '牛焼ビビン丼並盛', protein: 27.4, fat: 31.6, carbs: 99.8, calories: 811 },
             { chain: '松屋', name: '富士山豆腐の本格麻婆めし並盛', protein: 25.9, fat: 27.5, carbs: 103.8, calories: 793 },
 
-            // やよい軒 (yayoiken20250318.pdf) - 定食は主菜のみのデータが見当たらないため、代表的な丼物を中心に記載
-            { chain: 'やよい軒', name: 'しょうが焼定食', protein: 26.2, fat: 37.1, carbs: 72.9, calories: 717 }, // ごはん白米普通盛の場合
-            { chain: 'やよい軒', name: '肉野菜炒め定食', protein: 26.4, fat: 18.6, carbs: 71.4, calories: 545 }, // ごはん白米普通盛の場合
-            { chain: 'やよい軒', name: 'チキン南蛮定食', protein: 29.5, fat: 57.0, carbs: 104.5, calories: 1038 }, // ごはん白米普通盛の場合
-            { chain: 'やよい軒', name: 'サバの塩焼定食', protein: 32.9, fat: 35.1, carbs: 61.9, calories: 686 }, // ごはん白米普通盛の場合
+            // やよい軒 (yayoiken20250318.pdf) 
+            { chain: 'やよい軒', name: 'しょうが焼定食', protein: 26.2, fat: 37.1, carbs: 72.9, calories: 717 }, 
+            { chain: 'やよい軒', name: '肉野菜炒め定食', protein: 26.4, fat: 18.6, carbs: 71.4, calories: 545 }, 
+            { chain: 'やよい軒', name: 'チキン南蛮定食', protein: 29.5, fat: 57.0, carbs: 104.5, calories: 1038 }, 
+            { chain: 'やよい軒', name: 'サバの塩焼定食', protein: 32.9, fat: 35.1, carbs: 61.9, calories: 686 }, 
             { chain: 'やよい軒', name: '地鶏親子丼～阿波尾鶏～ごはん普通盛', protein: 36.1, fat: 13.8, carbs: 107.1, calories: 683 },
             { chain: 'やよい軒', name: 'かつ丼ごはん普通盛', protein: 36.2, fat: 32.4, carbs: 128.2, calories: 935 },
             { chain: 'やよい軒', name: '鉄火丼ごはん普通盛', protein: 30.4, fat: 3.3, carbs: 94.5, calories: 520 },
@@ -178,7 +185,7 @@
             { chain: 'マクドナルド', name: 'ダブルチーズバーガー', protein: 26.4, fat: 25.1, carbs: 31.8, calories: 459 },
             { chain: 'マクドナルド', name: 'ビッグマック®', protein: 26.1, fat: 28.0, carbs: 42.0, calories: 525 },
             { chain: 'マクドナルド', name: 'フィレオフィッシュ®', protein: 15.0, fat: 14.2, carbs: 37.4, calories: 338 },
-            { chain: 'マクドナルド', name: 'マックフライポテト® Mサイズ', protein: 5.3, fat: 21.0, carbs: 51.0, calories: 410 }, // PDFには直接Mサイズの記載がないが、一般的なデータを参照
+            { chain: 'マクドナルド', name: 'マックフライポテト® Mサイズ', protein: 5.3, fat: 21.0, carbs: 51.0, calories: 410 }, 
             
             // モスバーガー (mosburger20250521.pdf)
             { chain: 'モスバーガー', name: 'モスバーガー', protein: 15.2, fat: 17.0, carbs: 40.1, calories: 373 },
@@ -218,10 +225,10 @@
             'なか卯': { bg: 'bg-blue-50', border: 'border-blue-200', point: 'rgba(59, 130, 246, 0.7)', pointBorder: 'rgb(59, 130, 246)' },
             '餃子の王将': { bg: 'bg-gray-100', border: 'border-gray-300', point: 'rgba(156, 163, 175, 0.7)', pointBorder: 'rgb(156, 163, 175)' },
         };
-        
+
         let activeChains = Object.keys(chainColors);
         let searchTerm = '';
-        let sortConfig = { key: 'calories', direction: 'desc' };
+        let sortConfigs = [{ key: 'calories', direction: 'desc' }]; // 初期ソート: カロリー降順
 
         const chainFiltersContainer = document.getElementById('chain-filters');
         const searchInput = document.getElementById('search-input');
@@ -261,8 +268,9 @@
             ];
             keys.forEach(({ key, label }) => {
                 const button = document.createElement('button');
-                button.textContent = `↓ ${label}`;
+                button.textContent = label; // 初期表示はラベル名のみ
                 button.dataset.key = key;
+                button.dataset.label = label; // 元のラベルを保持
                 button.className = 'sort-button px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition';
                 button.onclick = () => setSortConfig(key);
                 sortControlsContainer.appendChild(button);
@@ -286,12 +294,22 @@
             updateApp();
         }
 
-        function setSortConfig(key) {
-            if (sortConfig.key === key) {
-                sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+        function setSortConfig(clickedKey) {
+            const existingConfigIndex = sortConfigs.findIndex(sc => sc.key === clickedKey);
+
+            if (existingConfigIndex !== -1) {
+                // キーが既に存在する場合、方向を反転し、先頭に移動
+                const existingConfig = sortConfigs.splice(existingConfigIndex, 1)[0];
+                existingConfig.direction = existingConfig.direction === 'asc' ? 'desc' : 'asc';
+                sortConfigs.unshift(existingConfig);
             } else {
-                sortConfig.key = key;
-                sortConfig.direction = 'desc';
+                // 新しいキーの場合、降順で先頭に追加
+                sortConfigs.unshift({ key: clickedKey, direction: 'desc' });
+            }
+
+            // ソートキーが2つを超えたら、古いもの（末尾）を削除
+            if (sortConfigs.length > 2) {
+                sortConfigs.pop();
             }
             updateApp();
         }
@@ -313,19 +331,29 @@
             );
 
             data.sort((a, b) => {
-                const valA = a[sortConfig.key];
-                const valB = b[sortConfig.key];
-                
-                if (valA === null) return 1;
-                if (valB === null) return -1;
+                for (let i = 0; i < sortConfigs.length; i++) {
+                    const config = sortConfigs[i];
+                    const valA = a[config.key];
+                    const valB = b[config.key];
 
-                if (sortConfig.direction === 'asc') {
-                    return valA - valB;
-                } else {
-                    return valB - valA;
+                    // null 値の処理: null を常に最後に持っていく (昇順・降順共通)
+                    if (valA === null && valB === null) continue; // 両方nullなら次のキーへ
+                    if (valA === null) return 1;  // aがnullならbを前に
+                    if (valB === null) return -1; // bがnullならaを前に
+                    
+                    let comparison = 0;
+                    if (valA < valB) {
+                        comparison = -1;
+                    } else if (valA > valB) {
+                        comparison = 1;
+                    }
+
+                    if (comparison !== 0) {
+                        return config.direction === 'asc' ? comparison : -comparison;
+                    }
                 }
+                return 0; // 全てのキーで等しい場合
             });
-
             return data;
         }
 
@@ -377,7 +405,7 @@
             };
 
             const averages = metrics.reduce((acc, key) => {
-                const validData = data.filter(d => d[key] !== null);
+                const validData = data.filter(d => d[key] !== null && typeof d[key] === 'number');
                 if (validData.length === 0) {
                     acc[key] = null;
                     return acc;
@@ -402,13 +430,13 @@
         function renderChart(data) {
             const chartData = {
                 datasets: data
-                    .filter(item => item.calories !== null && item.protein !== null)
+                    .filter(item => item.calories !== null && item.protein !== null && typeof item.calories === 'number' && typeof item.protein === 'number')
                     .map(item => ({
                         label: `${item.chain} - ${item.name}`,
                         data: [{
                             x: item.calories,
                             y: item.protein,
-                            r: item.fat ? Math.max(item.fat / 2, 5) : 5,
+                            r: (item.fat !== null && typeof item.fat ==='number') ? Math.max(item.fat / 2, 5) : 5,
                         }],
                         backgroundColor: chainColors[item.chain].point,
                         borderColor: chainColors[item.chain].pointBorder,
@@ -436,18 +464,19 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                const originalItem = menuData.find(d => 
+                                const originalItemArray = menuData.filter(d => 
                                     d.name === context.dataset.label.split(' - ')[1] &&
                                     d.chain === context.dataset.label.split(' - ')[0]
                                 );
-                                if (!originalItem) return '';
+                                if (!originalItemArray || originalItemArray.length === 0) return '';
+                                const originalItem = originalItemArray[0]; 
                                 let label = originalItem.name;
                                 let lines = [
                                     `${originalItem.chain} - ${label}`,
-                                    `カロリー: ${originalItem.calories.toFixed(0)} kcal`,
-                                    `タンパク質: ${originalItem.protein.toFixed(1)} g`,
-                                    `脂質: ${originalItem.fat.toFixed(1)} g`,
-                                    `炭水化物: ${originalItem.carbs.toFixed(1)} g`,
+                                    `カロリー: ${originalItem.calories !== null ? originalItem.calories.toFixed(0) : 'N/A'} kcal`,
+                                    `タンパク質: ${originalItem.protein !== null ? originalItem.protein.toFixed(1) : 'N/A'} g`,
+                                    `脂質: ${originalItem.fat !== null ? originalItem.fat.toFixed(1) : 'N/A'} g`,
+                                    `炭水化物: ${originalItem.carbs !== null ? originalItem.carbs.toFixed(1) : 'N/A'} g`,
                                 ];
                                 return lines;
                             }
@@ -487,13 +516,17 @@
         function updateSortButtons() {
             document.querySelectorAll('#sort-controls button').forEach(button => {
                 const key = button.dataset.key;
-                if (sortConfig.key === key) {
+                const originalLabel = button.dataset.label;
+                const sortSettingIndex = sortConfigs.findIndex(sc => sc.key === key);
+
+                if (sortSettingIndex !== -1) {
                     button.classList.add('active');
-                    const directionArrow = sortConfig.direction === 'asc' ? '↑' : '↓';
-                    button.textContent = `${directionArrow} ${button.textContent.substring(2)}`;
+                    const sortSetting = sortConfigs[sortSettingIndex];
+                    const directionArrow = sortSetting.direction === 'asc' ? '↑' : '↓';
+                    button.textContent = `${sortSettingIndex + 1}: ${directionArrow} ${originalLabel}`;
                 } else {
                     button.classList.remove('active');
-                    button.textContent = `↓ ${button.textContent.substring(2)}`;
+                    button.textContent = originalLabel;
                 }
             });
         }
