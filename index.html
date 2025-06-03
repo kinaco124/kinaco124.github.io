@@ -112,34 +112,97 @@
 
     <script>
         const menuData = [
-            { chain: 'すき家', name: '牛丼ミニ', protein: 17.1, fat: 15.1, carbs: 83.3, calories: 531 },
-            { chain: 'すき家', name: '牛丼並盛', protein: 22.9, fat: 20.4, carbs: 107.7, calories: 733 },
-            { chain: 'すき家', name: '牛丼大盛', protein: 29.8, fat: 28.5, carbs: 133.4, calories: 966 },
-            { chain: 'すき家', name: 'とろ〜り3種のチーズ牛丼並盛', protein: 34.5, fat: 37.1, carbs: 112.5, calories: 941 },
-            { chain: 'すき家', name: 'ねぎ玉牛丼並盛', protein: 29.0, fat: 28.1, carbs: 112.2, calories: 823 },
-            { chain: '吉野家', name: '牛丼小盛', protein: 15.0, fat: 16.6, carbs: 70.0, calories: 490 },
+            // すき家 (sukiya20250527.pdf)
+            { chain: 'すき家', name: '牛丼ミニ', protein: 15.7, fat: 17.2, carbs: 69.9, calories: 496 },
+            { chain: 'すき家', name: '牛丼並盛', protein: 22.9, fat: 25.0, carbs: 104.1, calories: 732 },
+            { chain: 'すき家', name: '牛丼中盛', protein: 28.4, fat: 35.8, carbs: 91.1, calories: 798 },
+            { chain: 'すき家', name: '牛丼大盛', protein: 30.1, fat: 32.4, carbs: 138.6, calories: 967 },
+            { chain: 'すき家', name: '牛丼特盛', protein: 40.4, fat: 48.9, carbs: 143.7, calories: 1176 },
+            { chain: 'すき家', name: '牛丼メガ', protein: 54.3, fat: 71.0, carbs: 150.8, calories: 1458 },
+            { chain: 'すき家', name: '鬼おろしポン酢牛丼並盛', protein: 24.0, fat: 25.1, carbs: 108.7, calories: 758 },
+            { chain: 'すき家', name: 'ねぎ玉牛丼並盛', protein: 30.6, fat: 31.5, carbs: 109.1, calories: 839 },
+            { chain: 'すき家', name: 'とろ〜り3種のチーズ牛丼並盛', protein: 33.2, fat: 37.2, carbs: 107.1, calories: 895 },
+            { chain: 'すき家', name: 'わさび山かけ牛丼並盛', protein: 24.4, fat: 25.1, carbs: 115.4, calories: 785 },
+            { chain: 'すき家', name: 'かつぶしオクラ牛丼並盛', protein: 24.7, fat: 25.1, carbs: 107.8, calories: 752 },
+            { chain: 'すき家', name: '高菜明太マヨ牛丼並盛', protein: 24.5, fat: 32.9, carbs: 108.2, calories: 829 },
+            { chain: 'すき家', name: 'キムチ牛丼並盛', protein: 24.5, fat: 25.4, carbs: 109.1, calories: 762 },
+            { chain: 'すき家', name: '牛丼ライト並盛', protein: 24.3, fat: 28.5, carbs: 18.5, calories: 425 },
+            { chain: 'すき家', name: 'カレー並盛', protein: 13.3, fat: 16.8, carbs: 118.8, calories: 680 },
+            { chain: 'すき家', name: '牛カレー並盛', protein: 23.7, fat: 32.9, carbs: 124.5, calories: 889 },
+            { chain: 'すき家', name: '旨だしとりそぼろ丼並盛', protein: 30.2, fat: 13.9, carbs: 108.5, calories: 683 },
+            { chain: 'すき家', name: 'まぐろたたき丼並盛', protein: 29.2, fat: 10.1, carbs: 100.0, calories: 608 },
+            { chain: 'すき家', name: '牛カルビ焼肉丼並盛', protein: 26.7, fat: 38.6, carbs: 112.2, calories: 902 },
+            { chain: 'すき家', name: 'うな丼並盛', protein: 23.1, fat: 18.7, carbs: 104.1, calories: 679 },
+
+            // 吉野家 (yoshinoya20250601.pdf)
+            { chain: '吉野家', name: '牛丼小盛', protein: 15.4, fat: 19.6, carbs: 60.9, calories: 474 },
             { chain: '吉野家', name: '牛丼並盛', protein: 19.6, fat: 23.6, carbs: 88.2, calories: 633 },
-            { chain: '吉野家', name: '牛丼大盛', protein: 26.5, fat: 33.9, carbs: 111.4, calories: 873 },
-            { chain: '吉野家', name: 'ねぎ玉牛丼並盛', protein: 25.5, fat: 29.9, carbs: 89.0, calories: 731 },
-            { chain: '吉野家', name: 'から揚げ丼並盛', protein: 35.1, fat: 37.1, carbs: 103.1, calories: 887 },
-            { chain: '松屋', name: '牛めしミニ', protein: 12.3, fat: 17.5, carbs: 73.1, calories: 499 },
-            { chain: '松屋', name: '牛めし並盛', protein: 17.6, fat: 23.5, carbs: 95.8, calories: 665 },
-            { chain: '松屋', name: '牛めし大盛', protein: 24.3, fat: 32.5, carbs: 124.7, calories: 889 },
-            { chain: '松屋', name: 'キムカル丼並盛', protein: 19.3, fat: 28.6, carbs: 101.4, calories: 740 },
-            { chain: '松屋', name: '創業ビーフカレー並盛', protein: 17.9, fat: 25.5, carbs: 108.9, calories: 737 },
-            { chain: 'やよい軒', name: 'しょうが焼定食', protein: 26.3, fat: 31.5, carbs: 121.2, calories: 874 },
-            { chain: 'やよい軒', name: 'サバの塩焼定食', protein: 32.2, fat: 28.1, carbs: 105.8, calories: 806 },
-            { chain: 'やよい軒', name: 'チキン南蛮定食', protein: 42.6, fat: 58.7, carbs: 130.4, calories: 1220 },
-            { chain: 'やよい軒', name: '肉野菜炒め定食', protein: 20.9, fat: 28.9, carbs: 114.7, calories: 799 },
-            { chain: 'マクドナルド', name: 'ハンバーガー', protein: 12.8, fat: 9.4, carbs: 30.5, calories: 256 },
-            { chain: 'マクドナルド', name: 'チーズバーガー', protein: 15.6, fat: 13.0, carbs: 31.1, calories: 307 },
-            { chain: 'マクドナルド', name: 'てりやきマックバーガー', protein: 15.0, fat: 28.5, carbs: 41.6, calories: 478 },
-            { chain: 'マクドナルド', name: 'ビッグマック®', protein: 25.6, fat: 29.5, carbs: 42.9, calories: 525 },
-            { chain: 'マクドナルド', name: 'マックフライポテト® M', protein: 5.3, fat: 21.0, carbs: 51.0, calories: 410 },
-            { chain: 'モスバーガー', name: 'モスバーガー', protein: 15.1, fat: 17.6, carbs: 36.3, calories: 364 },
-            { chain: 'モスバーガー', name: 'テリヤキバーガー', protein: 12.3, fat: 19.6, carbs: 40.7, calories: 389 },
-            { chain: 'モスバーガー', name: 'とびきりチーズ〜北海道産ゴーダチーズ使用〜', protein: 20.4, fat: 30.5, carbs: 35.8, calories: 498 },
-            { chain: 'モスバーガー', name: 'モスライスバーガー焼肉', protein: 10.1, fat: 10.8, carbs: 45.4, calories: 320 },
+            { chain: '吉野家', name: '牛丼アタマの大盛', protein: 23.0, fat: 28.8, carbs: 96.6, calories: 725 },
+            { chain: '吉野家', name: '牛丼大盛', protein: 24.8, fat: 29.0, carbs: 119.5, calories: 823 },
+            { chain: '吉野家', name: '牛丼特盛', protein: 33.5, fat: 44.2, carbs: 122.3, calories: 1006 },
+            { chain: '吉野家', name: '豚丼並盛', protein: 14.4, fat: 18.6, carbs: 88.1, calories: 576 },
+            { chain: '吉野家', name: 'ねぎ塩豚丼並盛', protein: 14.2, fat: 20.6, carbs: 90.0, calories: 599 },
+            { chain: '吉野家', name: '牛カルビ丼(成型肉)並盛', protein: 24.0, fat: 30.3, carbs: 94.7, calories: 743 },
+            { chain: '吉野家', name: '親子丼並盛', protein: 29.5, fat: 19.3, carbs: 101.7, calories: 695 },
+            { chain: '吉野家', name: 'から揚げ丼並盛(から揚げ3個)', protein: 31.9, fat: 44.0, carbs: 104.5, calories: 943 }, // PDFには個数明記ないが一般的な個数で解釈
+            { chain: '吉野家', name: '黒カレー並盛', protein: 8.2, fat: 6.4, carbs: 100.5, calories: 480 },
+            { chain: '吉野家', name: '牛黒カレー並盛', protein: 15.0, fat: 17.9, carbs: 103.3, calories: 622 },
+
+            // 松屋 (matsuya20240213.pdf)
+            { chain: '松屋', name: '牛めし小盛', protein: 13.5, fat: 22.8, carbs: 63.8, calories: 527 },
+            { chain: '松屋', name: '牛めし並盛', protein: 17.7, fat: 29.0, carbs: 91.5, calories: 715 },
+            { chain: '松屋', name: '牛めし大盛', protein: 22.8, fat: 36.0, carbs: 130.3, calories: 961 },
+            { chain: '松屋', name: 'ネギたっぷり旨辛ネギたま牛めし並盛', protein: 20.5, fat: 29.0, carbs: 100.0, calories: 846 },
+            { chain: '松屋', name: '鬼おろしポン酢牛めし並盛', protein: 18.9, fat: 29.1, carbs: 96.3, calories: 739 },
+            { chain: '松屋', name: 'キムチ牛めし並盛', protein: 19.4, fat: 29.8, carbs: 100.5, calories: 764 },
+            { chain: '松屋', name: 'チーズ牛めし並盛', protein: 31.6, fat: 46.1, carbs: 93.3, calories: 932 },
+            { chain: '松屋', name: '松屋ビーフカレー並盛', protein: 17.0, fat: 27.8, carbs: 109.3, calories: 783 },
+            { chain: '松屋', name: 'キムカル丼並盛', protein: 23.5, fat: 28.1, carbs: 104.3, calories: 781 },
+            { chain: '松屋', name: '牛焼ビビン丼並盛', protein: 27.4, fat: 31.6, carbs: 99.8, calories: 811 },
+            { chain: '松屋', name: '富士山豆腐の本格麻婆めし並盛', protein: 25.9, fat: 27.5, carbs: 103.8, calories: 793 },
+
+            // やよい軒 (yayoiken20250318.pdf) - 定食は主菜のみのデータが見当たらないため、代表的な丼物を中心に記載
+            { chain: 'やよい軒', name: 'しょうが焼定食', protein: 26.2, fat: 37.1, carbs: 72.9, calories: 717 }, // ごはん白米普通盛の場合
+            { chain: 'やよい軒', name: '肉野菜炒め定食', protein: 26.4, fat: 18.6, carbs: 71.4, calories: 545 }, // ごはん白米普通盛の場合
+            { chain: 'やよい軒', name: 'チキン南蛮定食', protein: 29.5, fat: 57.0, carbs: 104.5, calories: 1038 }, // ごはん白米普通盛の場合
+            { chain: 'やよい軒', name: 'サバの塩焼定食', protein: 32.9, fat: 35.1, carbs: 61.9, calories: 686 }, // ごはん白米普通盛の場合
+            { chain: 'やよい軒', name: '地鶏親子丼～阿波尾鶏～ごはん普通盛', protein: 36.1, fat: 13.8, carbs: 107.1, calories: 683 },
+            { chain: 'やよい軒', name: 'かつ丼ごはん普通盛', protein: 36.2, fat: 32.4, carbs: 128.2, calories: 935 },
+            { chain: 'やよい軒', name: '鉄火丼ごはん普通盛', protein: 30.4, fat: 3.3, carbs: 94.5, calories: 520 },
+
+            // マクドナルド (mcdonald20250602.pdf)
+            { chain: 'マクドナルド', name: 'ハンバーガー', protein: 13.0, fat: 9.5, carbs: 30.3, calories: 259 },
+            { chain: 'マクドナルド', name: 'チーズバーガー', protein: 15.9, fat: 13.5, carbs: 31.1, calories: 310 },
+            { chain: 'マクドナルド', name: 'てりやきマックバーガー', protein: 14.5, fat: 30.2, carbs: 37.5, calories: 477 },
+            { chain: 'マクドナルド', name: 'えびフィレオ', protein: 11.0, fat: 17.1, carbs: 50.9, calories: 399 },
+            { chain: 'マクドナルド', name: 'ダブルチーズバーガー', protein: 26.4, fat: 25.1, carbs: 31.8, calories: 459 },
+            { chain: 'マクドナルド', name: 'ビッグマック®', protein: 26.1, fat: 28.0, carbs: 42.0, calories: 525 },
+            { chain: 'マクドナルド', name: 'フィレオフィッシュ®', protein: 15.0, fat: 14.2, carbs: 37.4, calories: 338 },
+            { chain: 'マクドナルド', name: 'マックフライポテト® Mサイズ', protein: 5.3, fat: 21.0, carbs: 51.0, calories: 410 }, // PDFには直接Mサイズの記載がないが、一般的なデータを参照
+            
+            // モスバーガー (mosburger20250521.pdf)
+            { chain: 'モスバーガー', name: 'モスバーガー', protein: 15.2, fat: 17.0, carbs: 40.1, calories: 373 },
+            { chain: 'モスバーガー', name: 'テリヤキバーガー', protein: 14.4, fat: 20.1, carbs: 40.6, calories: 384 },
+            { chain: 'モスバーガー', name: 'モスチーズバーガー', protein: 18.2, fat: 21.4, carbs: 40.5, calories: 426 },
+            { chain: 'モスバーガー', name: 'とびきりチーズ～北海道チーズ～', protein: 21.9, fat: 24.7, carbs: 42.2, calories: 479 },
+            { chain: 'モスバーガー', name: 'ロースカツバーガー', protein: 16.6, fat: 16.4, carbs: 49.7, calories: 410 },
+            { chain: 'モスバーガー', name: '海老カツバーガー', protein: 14.5, fat: 19.3, carbs: 42.2, calories: 397 },
+            { chain: 'モスバーガー', name: 'モスライスバーガー海鮮かきあげ(塩だれ)', protein: 8.5, fat: 10.5, carbs: 61.3, calories: 372 },
+            { chain: 'モスバーガー', name: 'フレンチフライポテトS', protein: 2.2, fat: 7.0, carbs: 24.8, calories: 170 },
+
+            // なか卯 (nakau20250421.pdf)
+            { chain: 'なか卯', name: '和風牛丼小盛', protein: 13.0, fat: 18.8, carbs: 62.6, calories: 485 },
+            { chain: 'なか卯', name: '和風牛丼並盛', protein: 18.7, fat: 26.2, carbs: 95.2, calories: 713 },
+            { chain: 'なか卯', name: '和風牛丼大盛', protein: 26.4, fat: 36.3, carbs: 124.1, calories: 955 },
+            { chain: 'なか卯', name: '親子丼並盛', protein: 28.9, fat: 12.1, carbs: 94.9, calories: 620 },
+            { chain: 'なか卯', name: 'カツ丼並盛', protein: 29.9, fat: 28.4, carbs: 107.8, calories: 820 },
+            { chain: 'なか卯', name: '特製かき揚げ丼並盛', protein: 10.0, fat: 17.3, carbs: 102.8, calories: 623 },
+            { chain: 'なか卯', name: 'チーズ親子丼並盛', protein: 37.0, fat: 21.7, carbs: 95.6, calories: 740 },
+            { chain: 'なか卯', name: 'はいからうどん並', protein: 8.1, fat: 7.2, carbs: 55.6, calories: 319 },
+            { chain: 'なか卯', name: '牛肉うどん並', protein: 15.4, fat: 15.7, carbs: 60.9, calories: 453 },
+            { chain: 'なか卯', name: 'チキンカレー並盛', protein: 15.8, fat: 17.7, carbs: 107.5, calories: 673 },
+
+            // 餃子の王将 (既存データ、PDF提供なし)
             { chain: '餃子の王将', name: '餃子 (1人前6ヶ)', protein: null, fat: null, carbs: null, calories: 312 },
             { chain: '餃子の王将', name: '炒飯', protein: null, fat: null, carbs: null, calories: 746 },
             { chain: '餃子の王将', name: '天津飯', protein: null, fat: null, carbs: null, calories: 780 },
@@ -152,9 +215,10 @@
             'やよい軒': { bg: 'bg-purple-50', border: 'border-purple-200', point: 'rgba(168, 85, 247, 0.7)', pointBorder: 'rgb(168, 85, 247)' },
             'マクドナルド': { bg: 'bg-red-500/10', border: 'border-red-300', point: 'rgba(220, 38, 38, 0.7)', pointBorder: 'rgb(220, 38, 38)' },
             'モスバーガー': { bg: 'bg-green-50', border: 'border-green-200', point: 'rgba(34, 197, 94, 0.7)', pointBorder: 'rgb(34, 197, 94)' },
+            'なか卯': { bg: 'bg-blue-50', border: 'border-blue-200', point: 'rgba(59, 130, 246, 0.7)', pointBorder: 'rgb(59, 130, 246)' },
             '餃子の王将': { bg: 'bg-gray-100', border: 'border-gray-300', point: 'rgba(156, 163, 175, 0.7)', pointBorder: 'rgb(156, 163, 175)' },
         };
-
+        
         let activeChains = Object.keys(chainColors);
         let searchTerm = '';
         let sortConfig = { key: 'calories', direction: 'desc' };
