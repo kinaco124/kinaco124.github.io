@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外食PFC・カロリーナビ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #FDFBF7; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 400px; max-height: 50vh; }
+        @media (min-width: 768px) { .chart-container { height: 500px; } }
+        .table-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .table-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .table-scrollbar::-webkit-scrollbar-thumb { background: #c4b5a5; border-radius: 10px; }
+        .table-scrollbar::-webkit-scrollbar-thumb:hover { background: #a89988; }
+        .nav-button { transition: all 0.3s ease; }
+        .nav-button.active { background-color: #8D7B68; color: white; }
+        .nav-button:hover:not(.active) { background-color: #EFEBE4; }
+        .sort-button.active { background-color: #A4907C; color: white; transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div id="app" class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#6F6051] mb-2">外食PFC・カロリーナビ</h1>
+            <p class="text-md text-gray-600">主要外食チェーンのメニュー栄養情報をインタラクティブに探索・比較</p>
+        </header>
+
+        <main>
+            <div id="info-sections">
+                <section id="introduction" class="mb-12 bg-white/50 p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <h2 class="text-2xl font-bold mb-4 text-[#8D7B68]">はじめに：データで選ぶ、次の一食</h2>
+                    <p class="text-gray-700 leading-relaxed">
+                        このアプリケーションは、日本の主要な外食チェーンのメニューに含まれる栄養情報（タンパク質、脂質、炭水化物、カロリー）を可視化し、比較検討を容易にすることを目的としています。下のフィルターや検索、並べ替え機能を活用して、あなたの健康目標や気分に合ったメニューを見つけてみましょう。データは各社の公式発表に基づいていますが、最新情報は公式サイトでご確認ください。
+                    </p>
+                </section>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg mb-12 border border-gray-200">
+                <h3 class="text-xl font-bold mb-4 text-[#8D7B68]">絞り込み &amp; 並べ替え</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="font-semibold text-gray-700 block mb-2">チェーン店で絞り込む:</label>
+                        <div id="chain-filters" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div>
+                        <label for="search-input" class="font-semibold text-gray-700 block mb-2">メニュー名で検索:</label>
+                        <input type="text" id="search-input" placeholder="例: 牛丼, チーズ, ..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A4907C] focus:border-transparent transition">
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <label class="font-semibold text-gray-700 block mb-2">並べ替え:</label>
+                    <div id="sort-controls" class="flex flex-wrap gap-2"></div>
+                </div>
+                 <div id="ohsho-warning" class="mt-4 p-3 bg-amber-100 border-l-4 border-amber-500 text-amber-700 rounded-r-lg hidden">
+                    <p><strong class="font-bold">お知らせ:</strong> 「餃子の王将」は、公式サイトでPFC（タンパク質・脂質・炭水化物）の詳細な一覧が提供されていないため、本ツールではカロリー以外のデータが表示されません。</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-12">
+                <div class="xl:col-span-1 bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <h3 class="text-xl font-bold mb-4 text-[#8D7B68]">絞り込み結果の概要</h3>
+                    <p class="text-sm text-gray-500 mb-4">現在の選択範囲での平均値です。</p>
+                    <div id="summary-cards" class="space-y-4"></div>
+                </div>
+                <div class="xl:col-span-2 bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                     <h3 class="text-xl font-bold mb-4 text-[#8D7B68]">栄養バランス・ビジュアライゼーション</h3>
+                     <p class="text-sm text-gray-500 mb-4">各メニューの栄養ポジションを視覚的に確認できます。点にカーソルを合わせると詳細が表示されます。</p>
+                    <div class="chart-container">
+                        <canvas id="pfc-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <section id="data-table-section" class="mb-12">
+                <h2 class="text-2xl font-bold mb-4 text-[#8D7B68]">詳細データテーブル</h2>
+                <div class="w-full overflow-x-auto bg-white rounded-2xl shadow-lg border border-gray-200 table-scrollbar">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="p-4 font-semibold">商品名</th>
+                                <th class="p-4 font-semibold">チェーン店</th>
+                                <th class="p-4 font-semibold text-right">タンパク質 (g)</th>
+                                <th class="p-4 font-semibold text-right">脂質 (g)</th>
+                                <th class="p-4 font-semibold text-right">炭水化物 (g)</th>
+                                <th class="p-4 font-semibold text-right">カロリー (kcal)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menu-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="no-results" class="text-center py-12 text-gray-500 hidden">
+                    <p class="text-xl">該当するメニューが見つかりませんでした。</p>
+                    <p>絞り込み条件を変更してお試しください。</p>
+                </div>
+            </section>
+            
+            <section id="disclaimer" class="mt-12 text-center text-sm text-gray-500 bg-gray-50 p-6 rounded-2xl border">
+                 <h3 class="font-bold text-lg text-gray-700 mb-2">データの取り扱いに関するご注意</h3>
+                 <p>本アプリケーションに表示される栄養成分データは、各飲食チェーンの公式サイト（2025年6月時点）から取得したものです。メニューの改訂や情報の更新により、実際の数値と異なる場合があります。正確な情報が必要な場合や、アレルギー情報については、必ず各チェーンの公式サイトをご確認ください。</p>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        const menuData = [
+            { chain: 'すき家', name: '牛丼ミニ', protein: 17.1, fat: 15.1, carbs: 83.3, calories: 531 },
+            { chain: 'すき家', name: '牛丼並盛', protein: 22.9, fat: 20.4, carbs: 107.7, calories: 733 },
+            { chain: 'すき家', name: '牛丼大盛', protein: 29.8, fat: 28.5, carbs: 133.4, calories: 966 },
+            { chain: 'すき家', name: 'とろ〜り3種のチーズ牛丼並盛', protein: 34.5, fat: 37.1, carbs: 112.5, calories: 941 },
+            { chain: 'すき家', name: 'ねぎ玉牛丼並盛', protein: 29.0, fat: 28.1, carbs: 112.2, calories: 823 },
+            { chain: '吉野家', name: '牛丼小盛', protein: 15.0, fat: 16.6, carbs: 70.0, calories: 490 },
+            { chain: '吉野家', name: '牛丼並盛', protein: 19.6, fat: 23.6, carbs: 88.2, calories: 633 },
+            { chain: '吉野家', name: '牛丼大盛', protein: 26.5, fat: 33.9, carbs: 111.4, calories: 873 },
+            { chain: '吉野家', name: 'ねぎ玉牛丼並盛', protein: 25.5, fat: 29.9, carbs: 89.0, calories: 731 },
+            { chain: '吉野家', name: 'から揚げ丼並盛', protein: 35.1, fat: 37.1, carbs: 103.1, calories: 887 },
+            { chain: '松屋', name: '牛めしミニ', protein: 12.3, fat: 17.5, carbs: 73.1, calories: 499 },
+            { chain: '松屋', name: '牛めし並盛', protein: 17.6, fat: 23.5, carbs: 95.8, calories: 665 },
+            { chain: '松屋', name: '牛めし大盛', protein: 24.3, fat: 32.5, carbs: 124.7, calories: 889 },
+            { chain: '松屋', name: 'キムカル丼並盛', protein: 19.3, fat: 28.6, carbs: 101.4, calories: 740 },
+            { chain: '松屋', name: '創業ビーフカレー並盛', protein: 17.9, fat: 25.5, carbs: 108.9, calories: 737 },
+            { chain: 'やよい軒', name: 'しょうが焼定食', protein: 26.3, fat: 31.5, carbs: 121.2, calories: 874 },
+            { chain: 'やよい軒', name: 'サバの塩焼定食', protein: 32.2, fat: 28.1, carbs: 105.8, calories: 806 },
+            { chain: 'やよい軒', name: 'チキン南蛮定食', protein: 42.6, fat: 58.7, carbs: 130.4, calories: 1220 },
+            { chain: 'やよい軒', name: '肉野菜炒め定食', protein: 20.9, fat: 28.9, carbs: 114.7, calories: 799 },
+            { chain: 'マクドナルド', name: 'ハンバーガー', protein: 12.8, fat: 9.4, carbs: 30.5, calories: 256 },
+            { chain: 'マクドナルド', name: 'チーズバーガー', protein: 15.6, fat: 13.0, carbs: 31.1, calories: 307 },
+            { chain: 'マクドナルド', name: 'てりやきマックバーガー', protein: 15.0, fat: 28.5, carbs: 41.6, calories: 478 },
+            { chain: 'マクドナルド', name: 'ビッグマック®', protein: 25.6, fat: 29.5, carbs: 42.9, calories: 525 },
+            { chain: 'マクドナルド', name: 'マックフライポテト® M', protein: 5.3, fat: 21.0, carbs: 51.0, calories: 410 },
+            { chain: 'モスバーガー', name: 'モスバーガー', protein: 15.1, fat: 17.6, carbs: 36.3, calories: 364 },
+            { chain: 'モスバーガー', name: 'テリヤキバーガー', protein: 12.3, fat: 19.6, carbs: 40.7, calories: 389 },
+            { chain: 'モスバーガー', name: 'とびきりチーズ〜北海道産ゴーダチーズ使用〜', protein: 20.4, fat: 30.5, carbs: 35.8, calories: 498 },
+            { chain: 'モスバーガー', name: 'モスライスバーガー焼肉', protein: 10.1, fat: 10.8, carbs: 45.4, calories: 320 },
+            { chain: '餃子の王将', name: '餃子 (1人前6ヶ)', protein: null, fat: null, carbs: null, calories: 312 },
+            { chain: '餃子の王将', name: '炒飯', protein: null, fat: null, carbs: null, calories: 746 },
+            { chain: '餃子の王将', name: '天津飯', protein: null, fat: null, carbs: null, calories: 780 },
+        ];
+
+        const chainColors = {
+            'すき家': { bg: 'bg-red-50', border: 'border-red-200', point: 'rgba(239, 68, 68, 0.7)', pointBorder: 'rgb(239, 68, 68)' },
+            '吉野家': { bg: 'bg-orange-50', border: 'border-orange-200', point: 'rgba(249, 115, 22, 0.7)', pointBorder: 'rgb(249, 115, 22)' },
+            '松屋': { bg: 'bg-yellow-50', border: 'border-yellow-200', point: 'rgba(234, 179, 8, 0.7)', pointBorder: 'rgb(234, 179, 8)' },
+            'やよい軒': { bg: 'bg-purple-50', border: 'border-purple-200', point: 'rgba(168, 85, 247, 0.7)', pointBorder: 'rgb(168, 85, 247)' },
+            'マクドナルド': { bg: 'bg-red-500/10', border: 'border-red-300', point: 'rgba(220, 38, 38, 0.7)', pointBorder: 'rgb(220, 38, 38)' },
+            'モスバーガー': { bg: 'bg-green-50', border: 'border-green-200', point: 'rgba(34, 197, 94, 0.7)', pointBorder: 'rgb(34, 197, 94)' },
+            '餃子の王将': { bg: 'bg-gray-100', border: 'border-gray-300', point: 'rgba(156, 163, 175, 0.7)', pointBorder: 'rgb(156, 163, 175)' },
+        };
+
+        let activeChains = Object.keys(chainColors);
+        let searchTerm = '';
+        let sortConfig = { key: 'calories', direction: 'desc' };
+
+        const chainFiltersContainer = document.getElementById('chain-filters');
+        const searchInput = document.getElementById('search-input');
+        const tableBody = document.getElementById('menu-table-body');
+        const chartElement = document.getElementById('pfc-chart');
+        const sortControlsContainer = document.getElementById('sort-controls');
+        const summaryCardsContainer = document.getElementById('summary-cards');
+        const noResultsDiv = document.getElementById('no-results');
+        const ohshoWarningDiv = document.getElementById('ohsho-warning');
+
+        let pfcChart;
+
+        function initializeApp() {
+            setupChainFilters();
+            setupSortControls();
+            setupEventListeners();
+            updateApp();
+        }
+
+        function setupChainFilters() {
+            Object.keys(chainColors).forEach(chain => {
+                const button = document.createElement('button');
+                button.textContent = chain;
+                button.dataset.chain = chain;
+                button.className = `px-3 py-1.5 border rounded-full text-sm font-medium nav-button ${chainColors[chain].border} ${activeChains.includes(chain) ? 'active' : ''}`;
+                button.onclick = () => toggleChainFilter(chain);
+                chainFiltersContainer.appendChild(button);
+            });
+        }
+
+        function setupSortControls() {
+            const keys = [
+                { key: 'protein', label: 'タンパク質' },
+                { key: 'fat', label: '脂質' },
+                { key: 'carbs', label: '炭水化物' },
+                { key: 'calories', label: 'カロリー' }
+            ];
+            keys.forEach(({ key, label }) => {
+                const button = document.createElement('button');
+                button.textContent = `↓ ${label}`;
+                button.dataset.key = key;
+                button.className = 'sort-button px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition';
+                button.onclick = () => setSortConfig(key);
+                sortControlsContainer.appendChild(button);
+            });
+        }
+
+        function setupEventListeners() {
+            searchInput.addEventListener('input', (e) => {
+                searchTerm = e.target.value.toLowerCase();
+                updateApp();
+            });
+        }
+
+        function toggleChainFilter(chain) {
+            const index = activeChains.indexOf(chain);
+            if (index > -1) {
+                activeChains.splice(index, 1);
+            } else {
+                activeChains.push(chain);
+            }
+            updateApp();
+        }
+
+        function setSortConfig(key) {
+            if (sortConfig.key === key) {
+                sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortConfig.key = key;
+                sortConfig.direction = 'desc';
+            }
+            updateApp();
+        }
+
+        function updateApp() {
+            const filteredData = getFilteredAndSortedData();
+            renderTable(filteredData);
+            renderChart(filteredData);
+            updateFilterButtons();
+            updateSortButtons();
+            renderSummary(filteredData);
+            checkOhshoWarning();
+        }
+
+        function getFilteredAndSortedData() {
+            let data = menuData.filter(item => 
+                activeChains.includes(item.chain) &&
+                item.name.toLowerCase().includes(searchTerm)
+            );
+
+            data.sort((a, b) => {
+                const valA = a[sortConfig.key];
+                const valB = b[sortConfig.key];
+                
+                if (valA === null) return 1;
+                if (valB === null) return -1;
+
+                if (sortConfig.direction === 'asc') {
+                    return valA - valB;
+                } else {
+                    return valB - valA;
+                }
+            });
+
+            return data;
+        }
+
+        function renderTable(data) {
+            tableBody.innerHTML = '';
+            if (data.length === 0) {
+                noResultsDiv.classList.remove('hidden');
+                return;
+            }
+            noResultsDiv.classList.add('hidden');
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                const color = chainColors[item.chain];
+                row.className = `${color.bg} border-b ${color.border} hover:bg-opacity-50`;
+                
+                row.innerHTML = `
+                    <td class="p-4 font-medium">${item.name}</td>
+                    <td class="p-4">${item.chain}</td>
+                    <td class="p-4 text-right">${item.protein !== null ? item.protein.toFixed(1) : 'N/A'}</td>
+                    <td class="p-4 text-right">${item.fat !== null ? item.fat.toFixed(1) : 'N/A'}</td>
+                    <td class="p-4 text-right">${item.carbs !== null ? item.carbs.toFixed(1) : 'N/A'}</td>
+                    <td class="p-4 text-right font-bold">${item.calories !== null ? Math.round(item.calories) : 'N/A'}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function renderSummary(data) {
+            summaryCardsContainer.innerHTML = '';
+            
+            if (data.length === 0) {
+                summaryCardsContainer.innerHTML = `<p class="text-gray-500">データがありません。</p>`;
+                return;
+            }
+
+            const metrics = ['protein', 'fat', 'carbs', 'calories'];
+            const labels = {
+                protein: 'タンパク質',
+                fat: '脂質',
+                carbs: '炭水化物',
+                calories: 'カロリー'
+            };
+             const units = {
+                protein: 'g',
+                fat: 'g',
+                carbs: 'g',
+                calories: 'kcal'
+            };
+
+            const averages = metrics.reduce((acc, key) => {
+                const validData = data.filter(d => d[key] !== null);
+                if (validData.length === 0) {
+                    acc[key] = null;
+                    return acc;
+                }
+                const sum = validData.reduce((total, item) => total + item[key], 0);
+                acc[key] = sum / validData.length;
+                return acc;
+            }, {});
+
+            Object.keys(averages).forEach(key => {
+                const card = document.createElement('div');
+                card.className = 'bg-gray-50 p-4 rounded-lg border border-gray-200';
+                const value = averages[key];
+                card.innerHTML = `
+                    <p class="text-sm text-gray-500">平均${labels[key]}</p>
+                    <p class="text-2xl font-bold text-[#8D7B68]">${value !== null ? value.toFixed(1) : 'N/A'} <span class="text-base font-normal">${units[key]}</span></p>
+                `;
+                summaryCardsContainer.appendChild(card);
+            });
+        }
+
+        function renderChart(data) {
+            const chartData = {
+                datasets: data
+                    .filter(item => item.calories !== null && item.protein !== null)
+                    .map(item => ({
+                        label: `${item.chain} - ${item.name}`,
+                        data: [{
+                            x: item.calories,
+                            y: item.protein,
+                            r: item.fat ? Math.max(item.fat / 2, 5) : 5,
+                        }],
+                        backgroundColor: chainColors[item.chain].point,
+                        borderColor: chainColors[item.chain].pointBorder,
+                        borderWidth: 1,
+                    }))
+            };
+
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: { display: true, text: 'カロリー (kcal)', font: { size: 14 } },
+                        beginAtZero: true
+                    },
+                    y: {
+                        title: { display: true, text: 'タンパク質 (g)', font: { size: 14 } },
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const originalItem = menuData.find(d => 
+                                    d.name === context.dataset.label.split(' - ')[1] &&
+                                    d.chain === context.dataset.label.split(' - ')[0]
+                                );
+                                if (!originalItem) return '';
+                                let label = originalItem.name;
+                                let lines = [
+                                    `${originalItem.chain} - ${label}`,
+                                    `カロリー: ${originalItem.calories.toFixed(0)} kcal`,
+                                    `タンパク質: ${originalItem.protein.toFixed(1)} g`,
+                                    `脂質: ${originalItem.fat.toFixed(1)} g`,
+                                    `炭水化物: ${originalItem.carbs.toFixed(1)} g`,
+                                ];
+                                return lines;
+                            }
+                        },
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        cornerRadius: 4,
+                        displayColors: false,
+                    }
+                }
+            };
+
+            if (pfcChart) {
+                pfcChart.data = chartData;
+                pfcChart.update();
+            } else {
+                pfcChart = new Chart(chartElement, {
+                    type: 'bubble',
+                    data: chartData,
+                    options: chartOptions
+                });
+            }
+        }
+        
+        function updateFilterButtons() {
+            document.querySelectorAll('#chain-filters button').forEach(button => {
+                if (activeChains.includes(button.dataset.chain)) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+        
+        function updateSortButtons() {
+            document.querySelectorAll('#sort-controls button').forEach(button => {
+                const key = button.dataset.key;
+                if (sortConfig.key === key) {
+                    button.classList.add('active');
+                    const directionArrow = sortConfig.direction === 'asc' ? '↑' : '↓';
+                    button.textContent = `${directionArrow} ${button.textContent.substring(2)}`;
+                } else {
+                    button.classList.remove('active');
+                    button.textContent = `↓ ${button.textContent.substring(2)}`;
+                }
+            });
+        }
+
+        function checkOhshoWarning() {
+            if (activeChains.includes('餃子の王将')) {
+                ohshoWarningDiv.classList.remove('hidden');
+            } else {
+                ohshoWarningDiv.classList.add('hidden');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+    </script>
+
+</body>
+</html>
