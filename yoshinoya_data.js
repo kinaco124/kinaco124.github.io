@@ -41,9 +41,6 @@ const yoshinoyaMenuData = [
   { chain: '吉野家', name: '牛ねぎ玉丼特盛', protein: 38.9, fat: 44.9, carbs: 122.6, calories: 996 },
   { chain: '吉野家', name: '牛ねぎ玉丼超特盛', protein: 46.2, fat: 56.3, carbs: 124.9, calories: 1129 },
 
-  // 牛丼ファミリーサイズ
-  { chain: '吉野家', name: '牛丼ファミリーパック（1kg）', protein: 77.3, fat: 95.3, carbs: 335.6, calories: 2540 },
-
   // 親子丼
   { chain: '吉野家', name: '親子丼並盛', protein: 29.5, fat: 19.3, carbs: 101.7, calories: 695 },
   { chain: '吉野家', name: '親子丼大盛', protein: 40.1, fat: 27.0, carbs: 131.3, calories: 922 },
