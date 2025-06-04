@@ -1,4 +1,4 @@
-const menuData = [
+const sukiyaMenuData = [
   // --- すき家（sukiya20250527.pdf）全メニュー ---
   // 牛丼
   { chain: 'すき家', name: '牛丼ミニ', protein: 15.7, fat: 17.2, carbs: 69.9, calories: 496 },

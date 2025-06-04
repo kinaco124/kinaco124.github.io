@@ -1,4 +1,4 @@
-const menuData = [
+const yayoikenMenuData = [
   // やよい軒（yayoiken20250318.pdf）
 
   // 定食（白米 or ごはん普通盛 基準）

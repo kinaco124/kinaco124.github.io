@@ -1,4 +1,4 @@
-const menuData = [
+const yoshinoyaMenuData = [
   // --- 吉野家（yoshinoya20250601.pdf）全メニュー ---
 
   // 牛丼

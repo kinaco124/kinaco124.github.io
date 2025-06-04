@@ -1,4 +1,4 @@
-const menuData = [
+const nakauMenuData = [
   // なか卯：丼もの・カレー・合い盛り・うどん・そば・皿・定食・サイド・お子様・ドリンク etc.
 
   // 和風牛丼

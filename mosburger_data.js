@@ -1,4 +1,4 @@
-const menuData = [
+const mosburgerMenuData = [
   // 新とびきりバーガー
   { chain: 'モスバーガー', name: '新とびきりチーズ～北海道チーズ～', protein: 21.9, fat: 24.7, carbs: 42.2, calories: 479 },
   { chain: 'モスバーガー', name: 'ダブル新とびきりチーズ～北海道チーズ～', protein: 35.6, fat: 40.2, carbs: 50.4, calories: 707 },

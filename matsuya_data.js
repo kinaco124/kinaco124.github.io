@@ -1,4 +1,4 @@
-const menuData = [
+const matsuyaMenuData = [
   // 松屋（matsuya20240213.pdf）
 
   // 牛めし

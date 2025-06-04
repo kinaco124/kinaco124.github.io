@@ -1,4 +1,4 @@
-const menuData = [
+const mcdonaldMenuData = [
   // バーガー・サンド類
   { chain: 'マクドナルド', name: 'えびフィレオ®', protein: 11.0, fat: 17.1, carbs: 50.9, calories: 399 },
   { chain: 'マクドナルド', name: 'てりやきチキンフィレオ', protein: 19.9, fat: 23.1, carbs: 53.4, calories: 498 },
