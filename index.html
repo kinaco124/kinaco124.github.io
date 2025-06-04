@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>外食PFC・カロリーナビ</title>
     <!-- Chosen Palette: Warm Neutrals (Beige, Taupe, Soft Brown) -->
-    <!-- Application Structure Plan: Single-page dashboard. Externalized menu data. Enhanced sorting. Calorie range filter. Structure: Header, controls (filters, search, sort type, calorie range inputs, sort buttons), summary, main content (table, scatter plot), disclaimer. -->
-    <!-- Visualization & Content Choices: Report Info: PFC/Calorie data. Goal: Compare by nutritional value, ratios, calories, and combined criteria. Viz/Presentation: Interactive HTML table, Chart.js scatter plot. Interaction: Filters, search, sort type selection, calorie range input, multi-key sorting. Justification: Provides comprehensive and flexible data exploration. Library/Method: Vanilla JS, Tailwind CSS, Chart.js. -->
+    <!-- Application Structure Plan: Single-page dashboard. Externalized menu data. Enhanced sorting. Calorie and PFC range filters. Structure: Header, controls (filters, search, sort type, calorie & PFC range inputs, sort buttons), summary, main content (table, scatter plot), disclaimer. -->
+    <!-- Visualization & Content Choices: Report Info: PFC/Calorie data. Goal: Compare by nutritional value, ratios, calories, PFC amounts, and combined criteria. Viz/Presentation: Interactive HTML table, Chart.js scatter plot. Interaction: Filters, search, sort type selection, calorie/PFC range input, multi-key sorting. Justification: Provides highly comprehensive and flexible data exploration. Library/Method: Vanilla JS, Tailwind CSS, Chart.js. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -24,14 +24,14 @@
         .nav-button { transition: all 0.3s ease; }
         .nav-button.active { background-color: #8D7B68; color: white; }
         .nav-button:hover:not(.active) { background-color: #EFEBE4; }
-        .sort-button, .sort-type-button, .calorie-range-button { transition: all 0.2s ease-in-out; }
+        .sort-button, .sort-type-button, .filter-reset-button { transition: all 0.2s ease-in-out; }
         .sort-button.active, .sort-type-button.active { 
             background-color: #A4907C; 
             color: white; 
             transform: translateY(-1px); 
             box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.05);
         }
-        .sort-button:hover:not(.active), .sort-type-button:hover:not(.active), .calorie-range-button:hover { background-color: #f3f0ec; }
+        .sort-button:hover:not(.active), .sort-type-button:hover:not(.active), .filter-reset-button:hover { background-color: #f3f0ec; }
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
@@ -74,22 +74,61 @@
                     </div>
                 </div>
 
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label for="min-calories" class="font-semibold text-gray-700 block mb-2">カロリー下限 (kcal):</label>
-                        <input type="number" id="min-calories" placeholder="下限なし" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A4907C] focus:border-transparent transition">
-                    </div>
-                    <div>
-                        <label for="max-calories" class="font-semibold text-gray-700 block mb-2">カロリー上限 (kcal):</label>
-                        <input type="number" id="max-calories" placeholder="上限なし" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#A4907C] focus:border-transparent transition">
-                    </div>
-                    <div class="flex items-end">
-                        <button id="reset-calorie-filter" class="calorie-range-button w-full px-4 py-2 bg-gray-200 text-gray-700 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-300 transition">カロリー範囲リセット</button>
+                <div class="mt-6 border-t pt-6">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-3">栄養素の範囲で絞り込む:</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+                        <div>
+                            <label for="min-calories" class="font-semibold text-gray-600 block mb-1 text-sm">カロリー下限 (kcal):</label>
+                            <input type="number" id="min-calories" placeholder="下限なし" class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#A4907C] focus:border-transparent transition text-sm">
+                        </div>
+                        <div>
+                            <label for="max-calories" class="font-semibold text-gray-600 block mb-1 text-sm">カロリー上限 (kcal):</label>
+                            <input type="number" id="max-calories" placeholder="上限なし" class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#A4907C] focus:border-transparent transition text-sm">
+                        </div>
+                        <div class="flex items-end">
+                            <button id="reset-calorie-filter" class="filter-reset-button w-full px-3 py-1.5 bg-gray-100 text-gray-600 border border-gray-300 rounded-md shadow-sm hover:bg-gray-200 transition text-sm">カロリー範囲リセット</button>
+                        </div>
+
+                        <div>
+                            <label for="min-protein" class="font-semibold text-gray-600 block mb-1 text-sm">タンパク質下限 (g):</label>
+                            <input type="number" id="min-protein" placeholder="下限なし" class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#A4907C] focus:border-transparent transition text-sm">
+                        </div>
+                        <div>
+                            <label for="max-protein" class="font-semibold text-gray-600 block mb-1 text-sm">タンパク質上限 (g):</label>
+                            <input type="number" id="max-protein" placeholder="上限なし" class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#A4907C] focus:border-transparent transition text-sm">
+                        </div>
+                         <div class="flex items-end">
+                            <button id="reset-protein-filter" class="filter-reset-button w-full px-3 py-1.5 bg-gray-100 text-gray-600 border border-gray-300 rounded-md shadow-sm hover:bg-gray-200 transition text-sm">タンパク質範囲リセット</button>
+                        </div>
+
+                        <div>
+                            <label for="min-fat" class="font-semibold text-gray-600 block mb-1 text-sm">脂質下限 (g):</label>
+                            <input type="number" id="min-fat" placeholder="下限なし" class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#A4907C] focus:border-transparent transition text-sm">
+                        </div>
+                        <div>
+                            <label for="max-fat" class="font-semibold text-gray-600 block mb-1 text-sm">脂質上限 (g):</label>
+                            <input type="number" id="max-fat" placeholder="上限なし" class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#A4907C] focus:border-transparent transition text-sm">
+                        </div>
+                        <div class="flex items-end">
+                            <button id="reset-fat-filter" class="filter-reset-button w-full px-3 py-1.5 bg-gray-100 text-gray-600 border border-gray-300 rounded-md shadow-sm hover:bg-gray-200 transition text-sm">脂質範囲リセット</button>
+                        </div>
+
+                        <div>
+                            <label for="min-carbs" class="font-semibold text-gray-600 block mb-1 text-sm">炭水化物下限 (g):</label>
+                            <input type="number" id="min-carbs" placeholder="下限なし" class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#A4907C] focus:border-transparent transition text-sm">
+                        </div>
+                        <div>
+                            <label for="max-carbs" class="font-semibold text-gray-600 block mb-1 text-sm">炭水化物上限 (g):</label>
+                            <input type="number" id="max-carbs" placeholder="上限なし" class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-[#A4907C] focus:border-transparent transition text-sm">
+                        </div>
+                        <div class="flex items-end">
+                            <button id="reset-carbs-filter" class="filter-reset-button w-full px-3 py-1.5 bg-gray-100 text-gray-600 border border-gray-300 rounded-md shadow-sm hover:bg-gray-200 transition text-sm">炭水化物範囲リセット</button>
+                        </div>
                     </div>
                 </div>
 
 
-                <div class="mt-6">
+                <div class="mt-6 border-t pt-6">
                     <label class="font-semibold text-gray-700 block mb-2">並べ替えの種類:</label>
                     <div id="sort-type-controls" class="flex flex-wrap gap-2 mb-2">
                         <button id="sort-type-absolute" data-sort-type="absolute" class="sort-type-button px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm">絶対値でソート</button>
@@ -188,16 +227,33 @@
 
         let activeChains = Object.keys(chainColors);
         let searchTerm = '';
-        let minCalories = null;
-        let maxCalories = null;
+        let minCalories = null, maxCalories = null;
+        let minProtein = null, maxProtein = null;
+        let minFat = null, maxFat = null;
+        let minCarbs = null, maxCarbs = null;
+
         let sortConfigs = [{ key: 'calories', direction: 'desc', type: 'absolute' }];
         let currentSortType = 'absolute'; 
 
         const chainFiltersContainer = document.getElementById('chain-filters');
         const searchInput = document.getElementById('search-input');
+        
         const minCaloriesInput = document.getElementById('min-calories');
         const maxCaloriesInput = document.getElementById('max-calories');
         const resetCalorieFilterButton = document.getElementById('reset-calorie-filter');
+
+        const minProteinInput = document.getElementById('min-protein');
+        const maxProteinInput = document.getElementById('max-protein');
+        const resetProteinFilterButton = document.getElementById('reset-protein-filter');
+
+        const minFatInput = document.getElementById('min-fat');
+        const maxFatInput = document.getElementById('max-fat');
+        const resetFatFilterButton = document.getElementById('reset-fat-filter');
+
+        const minCarbsInput = document.getElementById('min-carbs');
+        const maxCarbsInput = document.getElementById('max-carbs');
+        const resetCarbsFilterButton = document.getElementById('reset-carbs-filter');
+
         const tableBody = document.getElementById('menu-table-body');
         const chartElement = document.getElementById('pfc-chart');
         const sortControlsContainer = document.getElementById('sort-controls');
@@ -234,7 +290,7 @@
                     if (sortConfigs.length > 0) {
                         sortConfigs[0].type = (sortConfigs[0].key === 'calories') ? 'absolute' : currentSortType;
                          if (sortConfigs.length > 1 && ['protein', 'fat', 'carbs'].includes(sortConfigs[1].key)) {
-                            sortConfigs[1].type = 'ratio'; // 第2キーがPFCなら強制的にratio
+                            sortConfigs[1].type = 'ratio'; 
                         }
                     }
                     updateSortTypeButtons();
@@ -277,21 +333,22 @@
                 searchTerm = e.target.value.toLowerCase();
                 updateApp();
             });
-            minCaloriesInput.addEventListener('input', (e) => {
-                minCalories = e.target.value === '' ? null : parseInt(e.target.value, 10);
-                updateApp();
-            });
-            maxCaloriesInput.addEventListener('input', (e) => {
-                maxCalories = e.target.value === '' ? null : parseInt(e.target.value, 10);
-                updateApp();
-            });
-            resetCalorieFilterButton.addEventListener('click', () => {
-                minCaloriesInput.value = '';
-                maxCaloriesInput.value = '';
-                minCalories = null;
-                maxCalories = null;
-                updateApp();
-            });
+
+            minCaloriesInput.addEventListener('input', (e) => { minCalories = e.target.value === '' ? null : parseInt(e.target.value, 10); updateApp(); });
+            maxCaloriesInput.addEventListener('input', (e) => { maxCalories = e.target.value === '' ? null : parseInt(e.target.value, 10); updateApp(); });
+            resetCalorieFilterButton.addEventListener('click', () => { minCaloriesInput.value = ''; maxCaloriesInput.value = ''; minCalories = null; maxCalories = null; updateApp(); });
+
+            minProteinInput.addEventListener('input', (e) => { minProtein = e.target.value === '' ? null : parseFloat(e.target.value); updateApp(); });
+            maxProteinInput.addEventListener('input', (e) => { maxProtein = e.target.value === '' ? null : parseFloat(e.target.value); updateApp(); });
+            resetProteinFilterButton.addEventListener('click', () => { minProteinInput.value = ''; maxProteinInput.value = ''; minProtein = null; maxProtein = null; updateApp(); });
+
+            minFatInput.addEventListener('input', (e) => { minFat = e.target.value === '' ? null : parseFloat(e.target.value); updateApp(); });
+            maxFatInput.addEventListener('input', (e) => { maxFat = e.target.value === '' ? null : parseFloat(e.target.value); updateApp(); });
+            resetFatFilterButton.addEventListener('click', () => { minFatInput.value = ''; maxFatInput.value = ''; minFat = null; maxFat = null; updateApp(); });
+
+            minCarbsInput.addEventListener('input', (e) => { minCarbs = e.target.value === '' ? null : parseFloat(e.target.value); updateApp(); });
+            maxCarbsInput.addEventListener('input', (e) => { maxCarbs = e.target.value === '' ? null : parseFloat(e.target.value); updateApp(); });
+            resetCarbsFilterButton.addEventListener('click', () => { minCarbsInput.value = ''; maxCarbsInput.value = ''; minCarbs = null; maxCarbs = null; updateApp(); });
         }
 
         function toggleChainFilter(chain) {
@@ -325,11 +382,10 @@
                 const firstKeyConfig = sortConfigs[0];
                 const secondKeyConfig = sortConfigs[1];
                 if (['protein', 'fat', 'carbs'].includes(secondKeyConfig.key)) {
-                     // 第1がカロリー または 第1がPFC絶対値 の場合、第2のPFCは比率
                     if (firstKeyConfig.key === 'calories' || (['protein', 'fat', 'carbs'].includes(firstKeyConfig.key) && firstKeyConfig.type === 'absolute')) {
                          secondKeyConfig.type = 'ratio';
                     } else {
-                         secondKeyConfig.type = 'absolute'; // それ以外は絶対値
+                         secondKeyConfig.type = 'absolute';
                     }
                 } else if (secondKeyConfig.key === 'calories') {
                     secondKeyConfig.type = 'absolute';
@@ -349,24 +405,42 @@
         }
         
         function getSortValue(item, key, type) {
-            if (type === 'ratio' && key !== 'calories') { // カロリーは比率ソート対象外
+            if (type === 'ratio' && key !== 'calories') { 
                 if (item.calories === null || item.calories <= 0 || item[key] === null) return null;
                 if (key === 'protein') return (item.protein * 4) / item.calories;
                 if (key === 'fat') return (item.fat * 9) / item.calories;
                 if (key === 'carbs') return (item.carbs * 4) / item.calories;
                 return null;
             }
-            return item[key]; // 絶対値ソートまたはカロリー
+            return item[key];
         }
 
         function getFilteredAndSortedData() {
             let data = menuData.filter(item => {
                 const matchesChain = activeChains.includes(item.chain);
                 const matchesSearch = item.name.toLowerCase().includes(searchTerm);
+                
                 const itemCalories = item.calories;
                 const matchesMinCalories = minCalories === null || (itemCalories !== null && itemCalories >= minCalories);
                 const matchesMaxCalories = maxCalories === null || (itemCalories !== null && itemCalories <= maxCalories);
-                return matchesChain && matchesSearch && matchesMinCalories && matchesMaxCalories;
+
+                const itemProtein = item.protein;
+                const matchesMinProtein = minProtein === null || (itemProtein !== null && itemProtein >= minProtein);
+                const matchesMaxProtein = maxProtein === null || (itemProtein !== null && itemProtein <= maxProtein);
+
+                const itemFat = item.fat;
+                const matchesMinFat = minFat === null || (itemFat !== null && itemFat >= minFat);
+                const matchesMaxFat = maxFat === null || (itemFat !== null && itemFat <= maxFat);
+
+                const itemCarbs = item.carbs;
+                const matchesMinCarbs = minCarbs === null || (itemCarbs !== null && itemCarbs >= minCarbs);
+                const matchesMaxCarbs = maxCarbs === null || (itemCarbs !== null && itemCarbs <= maxCarbs);
+
+                return matchesChain && matchesSearch && 
+                       matchesMinCalories && matchesMaxCalories &&
+                       matchesMinProtein && matchesMaxProtein &&
+                       matchesMinFat && matchesMaxFat &&
+                       matchesMinCarbs && matchesMaxCarbs;
             });
 
             data.sort((a, b) => {
