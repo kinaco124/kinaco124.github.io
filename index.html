@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>外食PFC・カロリーナビ</title>
-    <!-- Chosen Palette: Warm Neutrals (Beige, Taupe, Soft Brown) -->
-    <!-- Application Structure Plan: A single-page dashboard for interactive data exploration. Menu data is externalized, including new Subway data. Sorting logic for P, F, C is based on their caloric ratio. Structure: Header, control panel (filters, search, multi-key ratio-based sorting), summary, main content (table, scatter plot), disclaimer. -->
-    <!-- Visualization & Content Choices: Report Info: PFC/Calorie data. Goal: Compare menu items by nutritional value and ratios. Viz/Presentation: Interactive HTML table, Chart.js scatter plot. Interaction: Filters, search, multi-key sorting (PFC by ratio, Calories by absolute). Justification: Enables more nuanced nutritional comparison. Library/Method: Vanilla JS, Tailwind CSS, Chart.js. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -121,7 +117,6 @@
         </main>
     </div>
 
-    <!-- 店舗別データファイルの読み込み -->
     <script src="sukiya_data.js"></script>
     <script src="yoshinoya_data.js"></script>
     <script src="matsuya_data.js"></script>
@@ -133,6 +128,35 @@
     <script src="subway_data.js"></script> 
 
     <script>
+        // --- デバッグ用: データ読み込みチェック ここから ---
+        const expectedDataArrays = [
+            { name: 'sukiyaMenuData', file: 'sukiya_data.js', loaded: typeof sukiyaMenuData !== 'undefined' },
+            { name: 'yoshinoyaMenuData', file: 'yoshinoya_data.js', loaded: typeof yoshinoyaMenuData !== 'undefined' },
+            { name: 'matsuyaMenuData', file: 'matsuya_data.js', loaded: typeof matsuyaMenuData !== 'undefined' },
+            { name: 'yayoikenMenuData', file: 'yayoiken_data.js', loaded: typeof yayoikenMenuData !== 'undefined' },
+            { name: 'mcdonaldMenuData', file: 'mcdonald_data.js', loaded: typeof mcdonaldMenuData !== 'undefined' },
+            { name: 'mosburgerMenuData', file: 'mosburger_data.js', loaded: typeof mosburgerMenuData !== 'undefined' },
+            { name: 'nakauMenuData', file: 'nakau_data.js', loaded: typeof nakauMenuData !== 'undefined' },
+            { name: 'ohshoMenuData', file: 'ohsho_data.js', loaded: typeof ohshoMenuData !== 'undefined' },
+            { name: 'subwayMenuData', file: 'subway_data.js', loaded: typeof subwayMenuData !== 'undefined' }
+        ];
+
+        let allDataFilesReferenced = true;
+        console.log("--- データファイル読み込み状況チェック ---");
+        expectedDataArrays.forEach(dataInfo => {
+            if (dataInfo.loaded) {
+                console.log(`[成功] ${dataInfo.name} (from ${dataInfo.file}) は定義されています。`);
+            } else {
+                console.error(`[失敗] ${dataInfo.name} (from ${dataInfo.file}) が定義されていません。ファイルが正しい場所に存在し、内容に誤りがないか確認してください。`);
+                allDataFilesReferenced = false;
+            }
+        });
+
+        if (!allDataFilesReferenced) {
+            alert("一部のメニューデータファイルが読み込めませんでした。ブラウザのコンソールで詳細を確認してください。");
+        }
+        // --- デバッグ用: データ読み込みチェック ここまで ---
+
         // 外部ファイルから読み込んだ各店舗のデータを結合
         const menuData = [
             ...(typeof sukiyaMenuData !== 'undefined' ? sukiyaMenuData : []),
@@ -145,6 +169,16 @@
             ...(typeof ohshoMenuData !== 'undefined' ? ohshoMenuData : []),
             ...(typeof subwayMenuData !== 'undefined' ? subwayMenuData : [])
         ];
+        
+        if (menuData.length === 0) {
+            console.warn("警告: 結合後の menuData が空です。全てのデータファイルが空か、または読み込みに失敗している可能性があります。");
+            if (allDataFilesReferenced) { // 全てのファイルが参照はされたが、中身が空だった場合
+                 alert("データファイルは参照できましたが、中身が空のようです。各データファイルの内容を確認してください。");
+            }
+        } else {
+            console.log(`正常に ${menuData.length} 件のメニューデータを結合しました。`);
+        }
+
 
         const chainColors = {
             'すき家': { bg: 'bg-red-50', border: 'border-red-200', point: 'rgba(239, 68, 68, 0.7)', pointBorder: 'rgb(239, 68, 68)' },
@@ -174,6 +208,12 @@
         let pfcChart;
 
         function initializeApp() {
+            if (menuData.length === 0 && !allDataFilesReferenced) {
+                // データが全くない場合は、これ以上処理を進めても意味がないので、ここで終了するか、
+                // ユーザーに明確なエラーメッセージを表示するなどの対応を検討
+                console.error("メニューデータが利用できないため、アプリケーションの初期化を中止します。");
+                return; 
+            }
             setupChainFilters();
             setupSortControls();
             setupEventListeners();
@@ -480,7 +520,13 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', initializeApp);
+        // DOMContentLoaded内でinitializeAppを呼び出すことを確認
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            // DOMContentLoaded は既に発火済み
+            initializeApp();
+        }
 
     </script>
 
