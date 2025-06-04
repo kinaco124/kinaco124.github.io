@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>外食PFC・カロリーナビ</title>
+    <!-- Chosen Palette: Warm Neutrals (Beige, Taupe, Soft Brown) -->
+    <!-- Application Structure Plan: Single-page dashboard. Externalized menu data. Enhanced sorting: primary sort by absolute value, optional secondary sort by PFC ratio. Structure: Header, controls (filters, search, sort type toggle, multi-key sort buttons), summary, main content (table, scatter plot), disclaimer. -->
+    <!-- Visualization & Content Choices: Report Info: PFC/Calorie data. Goal: Compare by nutritional value, ratios, and combined criteria. Viz/Presentation: Interactive HTML table, Chart.js scatter plot. Interaction: Filters, search, sort type selection, multi-key sorting. Justification: Provides flexible and nuanced data exploration. Library/Method: Vanilla JS, Tailwind CSS, Chart.js. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,14 +24,14 @@
         .nav-button { transition: all 0.3s ease; }
         .nav-button.active { background-color: #8D7B68; color: white; }
         .nav-button:hover:not(.active) { background-color: #EFEBE4; }
-        .sort-button { transition: all 0.2s ease-in-out; }
-        .sort-button.active { 
+        .sort-button, .sort-type-button { transition: all 0.2s ease-in-out; }
+        .sort-button.active, .sort-type-button.active { 
             background-color: #A4907C; 
             color: white; 
             transform: translateY(-1px); 
             box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.05);
         }
-        .sort-button:hover:not(.active) { background-color: #f3f0ec; }
+        .sort-button:hover:not(.active), .sort-type-button:hover:not(.active) { background-color: #f3f0ec; }
     </style>
 </head>
 <body class="text-gray-800">
@@ -44,7 +48,7 @@
                 <section id="introduction" class="mb-12 bg-white/50 p-6 rounded-2xl shadow-sm border border-gray-200">
                     <h2 class="text-2xl font-bold mb-4 text-[#8D7B68]">はじめに：データで選ぶ、次の一食</h2>
                     <p class="text-gray-700 leading-relaxed">
-                        このアプリケーションは、日本の主要な外食チェーンのメニューに含まれる栄養情報（タンパク質、脂質、炭水化物、カロリー）を可視化し、比較検討を容易にすることを目的としています。下のフィルターや検索、並べ替え機能を活用して、あなたの健康目標や気分に合ったメニューを見つけてみましょう。データは各社の公式発表に基づいていますが、最新情報は公式サイトでご確認ください。メニューデータは各店舗ごとの外部ファイルから読み込まれています。タンパク質・脂質・炭水化物のソートはカロリーに対する比率で行われます。
+                        このアプリケーションは、日本の主要な外食チェーンのメニューに含まれる栄養情報（タンパク質、脂質、炭水化物、カロリー）を可視化し、比較検討を容易にすることを目的としています。下のフィルターや検索、並べ替え機能を活用して、あなたの健康目標や気分に合ったメニューを見つけてみましょう。データは各社の公式発表に基づいていますが、最新情報は公式サイトでご確認ください。メニューデータは各店舗ごとの外部ファイルから読み込まれています。
                     </p>
                 </section>
             </div>
@@ -62,7 +66,12 @@
                     </div>
                 </div>
                 <div class="mt-6">
-                    <label class="font-semibold text-gray-700 block mb-2">並べ替え (最大2項目まで指定可能):</label>
+                    <label class="font-semibold text-gray-700 block mb-2">並べ替えの種類:</label>
+                    <div id="sort-type-controls" class="flex flex-wrap gap-2 mb-2">
+                        <button id="sort-type-absolute" data-sort-type="absolute" class="sort-type-button px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm">絶対値でソート</button>
+                        <button id="sort-type-ratio" data-sort-type="ratio" class="sort-type-button px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm">比率でソート</button>
+                    </div>
+                    <label class="font-semibold text-gray-700 block mb-2">並べ替え項目 (最大2項目まで指定可能):</label>
                     <div id="sort-controls" class="flex flex-wrap gap-2"></div>
                 </div>
                  <div id="ohsho-warning" class="mt-4 p-3 bg-amber-100 border-l-4 border-amber-500 text-amber-700 rounded-r-lg hidden">
@@ -117,6 +126,7 @@
         </main>
     </div>
 
+    <!-- 店舗別データファイルの読み込み -->
     <script src="sukiya_data.js"></script>
     <script src="yoshinoya_data.js"></script>
     <script src="matsuya_data.js"></script>
@@ -128,36 +138,6 @@
     <script src="subway_data.js"></script> 
 
     <script>
-        // --- デバッグ用: データ読み込みチェック ここから ---
-        const expectedDataArrays = [
-            { name: 'sukiyaMenuData', file: 'sukiya_data.js', loaded: typeof sukiyaMenuData !== 'undefined' },
-            { name: 'yoshinoyaMenuData', file: 'yoshinoya_data.js', loaded: typeof yoshinoyaMenuData !== 'undefined' },
-            { name: 'matsuyaMenuData', file: 'matsuya_data.js', loaded: typeof matsuyaMenuData !== 'undefined' },
-            { name: 'yayoikenMenuData', file: 'yayoiken_data.js', loaded: typeof yayoikenMenuData !== 'undefined' },
-            { name: 'mcdonaldMenuData', file: 'mcdonald_data.js', loaded: typeof mcdonaldMenuData !== 'undefined' },
-            { name: 'mosburgerMenuData', file: 'mosburger_data.js', loaded: typeof mosburgerMenuData !== 'undefined' },
-            { name: 'nakauMenuData', file: 'nakau_data.js', loaded: typeof nakauMenuData !== 'undefined' },
-            { name: 'ohshoMenuData', file: 'ohsho_data.js', loaded: typeof ohshoMenuData !== 'undefined' },
-            { name: 'subwayMenuData', file: 'subway_data.js', loaded: typeof subwayMenuData !== 'undefined' }
-        ];
-
-        let allDataFilesReferenced = true;
-        console.log("--- データファイル読み込み状況チェック ---");
-        expectedDataArrays.forEach(dataInfo => {
-            if (dataInfo.loaded) {
-                console.log(`[成功] ${dataInfo.name} (from ${dataInfo.file}) は定義されています。`);
-            } else {
-                console.error(`[失敗] ${dataInfo.name} (from ${dataInfo.file}) が定義されていません。ファイルが正しい場所に存在し、内容に誤りがないか確認してください。`);
-                allDataFilesReferenced = false;
-            }
-        });
-
-        if (!allDataFilesReferenced) {
-            alert("一部のメニューデータファイルが読み込めませんでした。ブラウザのコンソールで詳細を確認してください。");
-        }
-        // --- デバッグ用: データ読み込みチェック ここまで ---
-
-        // 外部ファイルから読み込んだ各店舗のデータを結合
         const menuData = [
             ...(typeof sukiyaMenuData !== 'undefined' ? sukiyaMenuData : []),
             ...(typeof yoshinoyaMenuData !== 'undefined' ? yoshinoyaMenuData : []),
@@ -169,16 +149,6 @@
             ...(typeof ohshoMenuData !== 'undefined' ? ohshoMenuData : []),
             ...(typeof subwayMenuData !== 'undefined' ? subwayMenuData : [])
         ];
-        
-        if (menuData.length === 0) {
-            console.warn("警告: 結合後の menuData が空です。全てのデータファイルが空か、または読み込みに失敗している可能性があります。");
-            if (allDataFilesReferenced) { // 全てのファイルが参照はされたが、中身が空だった場合
-                 alert("データファイルは参照できましたが、中身が空のようです。各データファイルの内容を確認してください。");
-            }
-        } else {
-            console.log(`正常に ${menuData.length} 件のメニューデータを結合しました。`);
-        }
-
 
         const chainColors = {
             'すき家': { bg: 'bg-red-50', border: 'border-red-200', point: 'rgba(239, 68, 68, 0.7)', pointBorder: 'rgb(239, 68, 68)' },
@@ -194,13 +164,15 @@
 
         let activeChains = Object.keys(chainColors);
         let searchTerm = '';
-        let sortConfigs = [{ key: 'calories', direction: 'desc' }]; 
+        let sortConfigs = [{ key: 'calories', direction: 'desc', type: 'absolute' }]; // 初期ソート: カロリー絶対値降順
+        let currentSortType = 'absolute'; // 'absolute' or 'ratio'
 
         const chainFiltersContainer = document.getElementById('chain-filters');
         const searchInput = document.getElementById('search-input');
         const tableBody = document.getElementById('menu-table-body');
         const chartElement = document.getElementById('pfc-chart');
         const sortControlsContainer = document.getElementById('sort-controls');
+        const sortTypeControlsContainer = document.getElementById('sort-type-controls');
         const summaryCardsContainer = document.getElementById('summary-cards');
         const noResultsDiv = document.getElementById('no-results');
         const ohshoWarningDiv = document.getElementById('ohsho-warning');
@@ -208,14 +180,9 @@
         let pfcChart;
 
         function initializeApp() {
-            if (menuData.length === 0 && !allDataFilesReferenced) {
-                // データが全くない場合は、これ以上処理を進めても意味がないので、ここで終了するか、
-                // ユーザーに明確なエラーメッセージを表示するなどの対応を検討
-                console.error("メニューデータが利用できないため、アプリケーションの初期化を中止します。");
-                return; 
-            }
             setupChainFilters();
             setupSortControls();
+            setupSortTypeControls();
             setupEventListeners();
             updateApp();
         }
@@ -230,6 +197,33 @@
                 chainFiltersContainer.appendChild(button);
             });
         }
+        
+        function setupSortTypeControls() {
+            document.querySelectorAll('#sort-type-controls button').forEach(button => {
+                button.onclick = () => {
+                    currentSortType = button.dataset.sortType;
+                    // ソートタイプ変更時は、既存のソート条件をクリアするか、ユーザーに選択を促す
+                    // ここではシンプルに、第1ソートキーのみ残し、タイプを適用する
+                    if (sortConfigs.length > 0) {
+                        sortConfigs = [{ key: sortConfigs[0].key, direction: sortConfigs[0].direction, type: currentSortType }];
+                    }
+                    updateSortTypeButtons();
+                    updateApp(); // ソートタイプ変更で再描画
+                };
+            });
+            updateSortTypeButtons(); // 初期状態を反映
+        }
+
+        function updateSortTypeButtons() {
+            document.querySelectorAll('#sort-type-controls button').forEach(button => {
+                if (button.dataset.sortType === currentSortType) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+
 
         function setupSortControls() {
             const keys = [
@@ -268,18 +262,42 @@
 
         function setSortConfig(clickedKey) {
             const existingConfigIndex = sortConfigs.findIndex(sc => sc.key === clickedKey);
+            let newSortType = currentSortType;
 
-            if (existingConfigIndex !== -1) {
+            // カロリーは常に絶対値ソート
+            if (clickedKey === 'calories') {
+                newSortType = 'absolute';
+            }
+
+
+            if (existingConfigIndex !== -1) { // キーが既に存在
                 const existingConfig = sortConfigs.splice(existingConfigIndex, 1)[0];
                 existingConfig.direction = existingConfig.direction === 'asc' ? 'desc' : 'asc';
+                existingConfig.type = newSortType; // 既存のキーでもタイプを更新
                 sortConfigs.unshift(existingConfig);
-            } else {
-                sortConfigs.unshift({ key: clickedKey, direction: 'desc' });
+            } else { // 新しいキー
+                sortConfigs.unshift({ key: clickedKey, direction: 'desc', type: newSortType });
             }
 
             if (sortConfigs.length > 2) {
                 sortConfigs.pop();
             }
+            
+            // 第2ソートキーがPFCの場合、強制的に比率ソートにする
+            if (sortConfigs.length === 2 && ['protein', 'fat', 'carbs'].includes(sortConfigs[1].key)) {
+                 if (sortConfigs[0].key === 'calories') { // 第1がカロリーなら第2は比率
+                    sortConfigs[1].type = 'ratio';
+                 } else if (['protein', 'fat', 'carbs'].includes(sortConfigs[0].key) && sortConfigs[0].type === 'absolute') {
+                    // 第1がPFC絶対値なら、第2のPFCは比率
+                    sortConfigs[1].type = 'ratio';
+                 }
+            }
+            // 第1ソートキーがPFCで、ソートタイプが「比率」の場合
+             if (sortConfigs.length > 0 && ['protein', 'fat', 'carbs'].includes(sortConfigs[0].key) && currentSortType === 'ratio') {
+                sortConfigs[0].type = 'ratio';
+            }
+
+
             updateApp();
         }
 
@@ -293,6 +311,19 @@
             checkOhshoWarning();
         }
 
+        function getSortValue(item, key, type) {
+            if (type === 'ratio') {
+                if (item.calories === null || item.calories <= 0) return null;
+                if (key === 'protein' && item.protein !== null) return (item.protein * 4) / item.calories;
+                if (key === 'fat' && item.fat !== null) return (item.fat * 9) / item.calories;
+                if (key === 'carbs' && item.carbs !== null) return (item.carbs * 4) / item.calories;
+                return null; // 比率計算不可
+            }
+            // absolute or calories
+            return item[key];
+        }
+
+
         function getFilteredAndSortedData() {
             let data = menuData.filter(item => 
                 activeChains.includes(item.chain) &&
@@ -302,30 +333,35 @@
             data.sort((a, b) => {
                 for (let i = 0; i < sortConfigs.length; i++) {
                     const config = sortConfigs[i];
-                    let compareValA, compareValB;
-
-                    if (config.key === 'protein') {
-                        compareValA = (a.protein !== null && a.calories !== null && a.calories > 0) ? (a.protein * 4) / a.calories : null;
-                        compareValB = (b.protein !== null && b.calories !== null && b.calories > 0) ? (b.protein * 4) / b.calories : null;
-                    } else if (config.key === 'fat') {
-                        compareValA = (a.fat !== null && a.calories !== null && a.calories > 0) ? (a.fat * 9) / a.calories : null;
-                        compareValB = (b.fat !== null && b.calories !== null && b.calories > 0) ? (b.fat * 9) / b.calories : null;
-                    } else if (config.key === 'carbs') {
-                        compareValA = (a.carbs !== null && a.calories !== null && a.calories > 0) ? (a.carbs * 4) / a.calories : null;
-                        compareValB = (b.carbs !== null && b.calories !== null && b.calories > 0) ? (b.carbs * 4) / b.calories : null;
-                    } else { 
-                        compareValA = a[config.key];
-                        compareValB = b[config.key];
+                    // 第1ソートキーのタイプは currentSortType を優先、ただしカロリーは常に絶対値
+                    // 第2ソートキーのタイプは、第1が絶対値のPFCなら比率、それ以外は絶対値
+                    let sortTypeForThisKey = config.type;
+                    if (i === 0 && config.key !== 'calories') { // 第1ソートキー
+                        sortTypeForThisKey = currentSortType;
+                    } else if (i === 1) { // 第2ソートキー
+                        const firstKeyConfig = sortConfigs[0];
+                        if (['protein', 'fat', 'carbs'].includes(config.key) && // 第2がPFCで
+                            (firstKeyConfig.key === 'calories' || // 第1がカロリー または
+                             (['protein', 'fat', 'carbs'].includes(firstKeyConfig.key) && firstKeyConfig.type === 'absolute'))) { // 第1がPFC絶対値
+                            sortTypeForThisKey = 'ratio';
+                        } else {
+                             sortTypeForThisKey = 'absolute'; // それ以外は絶対値
+                        }
                     }
+                     if (config.key === 'calories') sortTypeForThisKey = 'absolute';
+
+
+                    const valA = getSortValue(a, config.key, sortTypeForThisKey);
+                    const valB = getSortValue(b, config.key, sortTypeForThisKey);
                     
-                    if (compareValA === null && compareValB === null) continue; 
-                    if (compareValA === null) return 1;  
-                    if (compareValB === null) return -1; 
+                    if (valA === null && valB === null) continue; 
+                    if (valA === null) return 1;  
+                    if (valB === null) return -1; 
                     
                     let comparison = 0;
-                    if (compareValA < compareValB) {
+                    if (valA < valB) {
                         comparison = -1;
-                    } else if (compareValA > compareValB) {
+                    } else if (valA > valB) {
                         comparison = 1;
                     }
 
@@ -504,7 +540,20 @@
                     button.classList.add('active');
                     const sortSetting = sortConfigs[sortSettingIndex];
                     const directionArrow = sortSetting.direction === 'asc' ? '↑' : '↓';
-                    button.textContent = `${sortSettingIndex + 1}: ${directionArrow} ${originalLabel}`;
+                    let sortTypeLabel = '';
+                    if (key !== 'calories') { // カロリー以外のPFC項目
+                        if (sortSettingIndex === 0 && currentSortType === 'ratio') {
+                            sortTypeLabel = '(比率)';
+                        } else if (sortSettingIndex === 1 && sortConfigs[0].key === 'calories') {
+                             sortTypeLabel = '(比率)';
+                        } else if (sortSettingIndex === 1 && ['protein', 'fat', 'carbs'].includes(sortConfigs[0].key) && sortConfigs[0].type === 'absolute'){
+                             sortTypeLabel = '(比率)';
+                        }
+                         else if (sortSetting.type === 'ratio') {
+                            sortTypeLabel = '(比率)';
+                        }
+                    }
+                    button.textContent = `${sortSettingIndex + 1}: ${directionArrow} ${originalLabel} ${sortTypeLabel}`;
                 } else {
                     button.classList.remove('active');
                     button.textContent = originalLabel;
@@ -520,11 +569,9 @@
             }
         }
 
-        // DOMContentLoaded内でinitializeAppを呼び出すことを確認
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeApp);
         } else {
-            // DOMContentLoaded は既に発火済み
             initializeApp();
         }
 
